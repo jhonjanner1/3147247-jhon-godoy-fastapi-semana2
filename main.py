@@ -1,71 +1,60 @@
+# Sin type hints (como en Semana 1)
+def greet(name):
+    return f"Hello {name}!"
 
-#!/usr/bin/env python3
-"""
-Mi Primera API FastAPI - Verificación de Setup
-Desarrollador: [Tu nombre se llenará automáticamente]
-"""
+# Con type hints (lo que aprenderemos hoy)
+def greet(name: str) -> str:
+    return f"Hello {name}!"
+# Tipos simples para APIs
+def create_user(name: str, age: int, active: bool) -> dict:
+    return {"name": name, "age": age, "active": active}
 
-from fastapi import FastAPI
-import os
-import sys
-from datetime import datetime
+def get_numbers() -> list:
+    return [1, 2, 3, 4, 5]
 
-# Crear instancia de FastAPI
-app = FastAPI(
-    title="Mi Primera API FastAPI",
-    description="API de verificación para setup del bootcamp",
-    version="1.0.0"
-)
-
-@app.get("/")
-def home():
-    """Endpoint principal de verificación"""
-    return {
-        "message": "¡Setup completado correctamente!",
-        "project": "FastAPI Bootcamp - Semana 1",
-        "timestamp": datetime.now().isoformat(),
-        "status": "✅ Working perfectly"
-    }
-
-@app.get("/info/setup")
-def info_setup():
-    """Información del entorno de desarrollo"""
-    return {
-        "python_version": sys.version,
-        "python_path": sys.executable,
-        "working_directory": os.getcwd(),
-        "virtual_env": os.environ.get("VIRTUAL_ENV", "No detectado"),
-        "user": os.environ.get("USER", "No detectado"),
-        "hostname": os.environ.get("HOSTNAME", "No detectado")
-    }
-
-@app.get("/health")
-def health_check():
-    """Endpoint de verificación de salud"""
-    return {
-        "status": "healthy",
-        "message": "API running correctly",
-        "environment": "development"
-    }
-
-if __name__ == "__main__":
-    import uvicorn
-    print("🚀 Iniciando servidor de verificación...")
-    print("🌐 Acceder a: http://localhost:8000")
-    print("📄 Documentación: http://localhost:8000/docs")
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+def get_config() -> dict:
+    return {"debug": True, "version": "1.0"}
 from fastapi import FastAPI
 
-app = FastAPI(title="Mi Primera API")
+app = FastAPI(title="My First API")
 
+# ANTES (Semana 1)
 @app.get("/")
 def hello_world():
-    return {"message": "¡Mi primera API FastAPI!"}
+    return {"message": "My first FastAPI!"}
 
-@app.get("/info")
-def info():
-    return {"api": "FastAPI", "week": 1, "status": "running"}
+# DESPUÉS (con type hints)
+@app.get("/")
+def hello_world() -> dict:
+    return {"message": "My first FastAPI!"}
 
+# Si tenías endpoint con parámetro
 @app.get("/greeting/{name}")
-def greet_user(name: str):
-    return {"greeting": f"¡Hola {name}!"}
+def greet_user(name: str) -> dict:
+    return {"greeting": f"Hello {name}!"}
+
+# Endpoint con múltiples parámetros
+@app.get("/calculate/{num1}/{num2}")
+def calculate(num1: int, num2: int) -> dict:
+    result = num1 + num2
+    return {"result": result, "operation": "sum"}
+from typing import List, Dict
+
+# Lista de strings
+@app.get("/fruits")
+def get_fruits() -> List[str]:
+    return ["apple", "banana", "orange"]
+
+# Lista de números
+@app.get("/numbers")
+def get_numbers() -> List[int]:
+    return [1, 2, 3, 4, 5]
+
+# Diccionario con estructura conocida
+@app.get("/user/{user_id}")
+def get_user(user_id: int) -> Dict[str, str]:
+    return {
+        "id": str(user_id),
+        "name": "Demo User",
+        "email": "demo@example.com"
+    }
