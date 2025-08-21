@@ -1,60 +1,65 @@
-# Sin type hints (como en Semana 1)
-def greet(name):
-    return f"Hello {name}!"
-
-# Con type hints (lo que aprenderemos hoy)
-def greet(name: str) -> str:
-    return f"Hello {name}!"
-# Tipos simples para APIs
-def create_user(name: str, age: int, active: bool) -> dict:
-    return {"name": name, "age": age, "active": active}
-
-def get_numbers() -> list:
-    return [1, 2, 3, 4, 5]
-
-def get_config() -> dict:
-    return {"debug": True, "version": "1.0"}
 from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List, Optional
 
-app = FastAPI(title="My First API")
+app = FastAPI(title="API de Productos")
 
-# ANTES (Semana 1)
-@app.get("/")
-def hello_world():
-    return {"message": "My first FastAPI!"}
+# Modelo Pydantic para Producto
+class Product(BaseModel):
+    name: str
+    price: float
+    category: str
+    in_stock: bool = True
 
-# DESPUÉS (con type hints)
+# Lista temporal de productos (simula base de datos)
+products = [
+    {"id": 1, "name": "Laptop", "price": 999.99, "category": "Electronics", "in_stock": True},
+    {"id": 2, "name": "Mouse", "price": 25.50, "category": "Electronics", "in_stock": True},
+    {"id": 3, "name": "Libro", "price": 15.00, "category": "Education", "in_stock": False}
+]
+
+# 1. GET Hello World
 @app.get("/")
 def hello_world() -> dict:
-    return {"message": "My first FastAPI!"}
+    return {"message": "¡Bienvenido a la API de Productos!"}
 
-# Si tenías endpoint con parámetro
-@app.get("/greeting/{name}")
-def greet_user(name: str) -> dict:
-    return {"greeting": f"Hello {name}!"}
+# 2. GET Todos los productos
+@app.get("/products")
+def get_products() -> dict:
+    return {"products": products, "total": len(products)}
 
-# Endpoint con múltiples parámetros
-@app.get("/calculate/{num1}/{num2}")
-def calculate(num1: int, num2: int) -> dict:
-    result = num1 + num2
-    return {"result": result, "operation": "sum"}
-from typing import List, Dict
+# 3. POST Crear producto
+@app.post("/products")
+def create_product(product: Product) -> dict:
+    new_product = product.dict()
+    new_product["id"] = len(products) + 1
+    products.append(new_product)
+    return {"message": "Producto creado", "product": new_product}
 
-# Lista de strings
-@app.get("/fruits")
-def get_fruits() -> List[str]:
-    return ["apple", "banana", "orange"]
+# 4. GET Producto por ID
+@app.get("/products/{product_id}")
+def get_product(product_id: int) -> dict:
+    for product in products:
+        if product["id"] == product_id:
+            return {"product": product}
+    return {"error": "Producto no encontrado"}
 
-# Lista de números
-@app.get("/numbers")
-def get_numbers() -> List[int]:
-    return [1, 2, 3, 4, 5]
-
-# Diccionario con estructura conocida
-@app.get("/user/{user_id}")
-def get_user(user_id: int) -> Dict[str, str]:
-    return {
-        "id": str(user_id),
-        "name": "Demo User",
-        "email": "demo@example.com"
-    }
+# 5. GET Buscar productos
+@app.get("/search")
+def search_products(
+    name: Optional[str] = None,
+    category: Optional[str] = None,
+    in_stock: Optional[bool] = None
+) -> dict:
+    results = products
+    
+    if name:
+        results = [p for p in results if name.lower() in p["name"].lower()]
+    
+    if category:
+        results = [p for p in results if p["category"].lower() == category.lower()]
+    
+    if in_stock is not None:
+        results = [p for p in results if p["in_stock"] == in_stock]
+    
+    return {"results": results, "count": len(results)}

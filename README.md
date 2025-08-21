@@ -1,10 +1,20 @@
-# Mi Primera API FastAPI
+# Mi API FastAPI - Semana 2
 
 ## ¿Qué hace?
-Una API básica creada en el Bootcamp FastAPI Semana 1.  
-Incluye endpoints de bienvenida, información de la API y un perfil personal.
+
+API mejorada con validación automática de datos y type hints.
+
+## Nuevos Features (Semana 2)
+
+- ✅ Type hints en todas las funciones
+- ✅ Validación automática con Pydantic
+- ✅ Endpoint POST para crear datos
+- ✅ Parámetros de ruta (ejemplo: /products/{id})
+- ✅ Búsqueda con parámetros query
 
 ## ¿Cómo ejecutar?
+
 ```bash
-pip install -r requirements.txt
+pip install fastapi pydantic uvicorn
 uvicorn main:app --reload
+```
